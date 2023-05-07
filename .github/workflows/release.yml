@@ -1,0 +1,30 @@
+name: Jar Build CI
+
+on:
+  push:
+    tags:
+      - v*
+  pull_request:
+    tags:
+      - v*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: 17
+      - run: chmod +x gradlew && ./gradlew jar
+        working-directory: .
+      - uses: ncipollo/release-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.SUBMISSIONBOT_TOKEN }}
+        with:
+          artifacts: "build/libs/release.jar"
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: build/
