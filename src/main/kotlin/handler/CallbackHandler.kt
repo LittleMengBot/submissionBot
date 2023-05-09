@@ -85,7 +85,7 @@ class CallbackHandler(
                 SubmissionFactory(
                     bot,
                     groupChatId = callback.message!!.chat.id.chatId,
-                    callbackmessageId = callback.message!!.messageId,
+                    callbackMessageId = callback.message!!.messageId,
                     callbackReplyMessageId = callback.message!!.reply_to_message!!.messageId,
                     reader = callback.from,
                     type = "callback"
@@ -307,7 +307,7 @@ class CallbackHandler(
                 keepSource = false
             ),
             replyMarkup = KeyBoardBuilder("group", null)
-                .buildGroup(dataList[2], dataList[3], messageType, isAnon),
+                .buildGroup(dataList[2], message, messageType, isAnon),
             parseMode = MarkdownV2
         )
     }

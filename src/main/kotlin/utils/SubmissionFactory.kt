@@ -4,17 +4,22 @@ import db.RedisService
 import dev.inmo.tgbotapi.extensions.api.chat.get.getChat
 import dev.inmo.tgbotapi.extensions.api.edit.caption.editMessageCaption
 import dev.inmo.tgbotapi.extensions.api.edit.edit
+import dev.inmo.tgbotapi.extensions.api.send.media.sendAnimation
 import dev.inmo.tgbotapi.extensions.api.send.media.sendMediaGroup
+import dev.inmo.tgbotapi.extensions.api.send.media.sendPhoto
+import dev.inmo.tgbotapi.extensions.api.send.media.sendVideo
 import dev.inmo.tgbotapi.extensions.api.send.resend
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
-import dev.inmo.tgbotapi.extensions.utils.asPrivateChat
-import dev.inmo.tgbotapi.extensions.utils.asTextedInput
+import dev.inmo.tgbotapi.extensions.utils.*
 import dev.inmo.tgbotapi.extensions.utils.formatting.textMentionMarkdownV2
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.Identifier
 import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.chat.User
+import dev.inmo.tgbotapi.types.files.PhotoSize
+import dev.inmo.tgbotapi.types.files.VideoFile
+import dev.inmo.tgbotapi.types.media.*
 import dev.inmo.tgbotapi.types.message.MarkdownV2
 import dev.inmo.tgbotapi.types.message.abstracts.ContentMessage
 import dev.inmo.tgbotapi.types.message.content.*
@@ -27,7 +32,7 @@ class SubmissionFactory(
     private val bot: BehaviourContext,
     private val groupChatId: Long,
     private val groupMessageId: Long? = null,
-    private val callbackmessageId: Long? = null,
+    private val callbackMessageId: Long? = null,
     private val callbackReplyMessageId: Long? = null,
     private val reader: User,
     private val type: String,
@@ -49,7 +54,7 @@ class SubmissionFactory(
                     bot.sendMessage(ChatId(groupChatId), getI18nString("command.ok.error"))
                 }
                 "callback" -> {
-                    bot.edit(ChatId(groupChatId), callbackmessageId!!, getI18nString("command.ok.error"))
+                    bot.edit(ChatId(groupChatId), callbackMessageId!!, getI18nString("command.ok.error"))
                 }
             }
             return
@@ -58,18 +63,29 @@ class SubmissionFactory(
             val sourceMessage = MessageSerializer.parseSingleMessage(
                 GzipUtils.uncompress(compressedSource)
             )
-            bot.resend(
-                ChatId(ConfigLoader.config!!.channel as Identifier),
-                sourceMessage
-            )
+            if (dataList[5] == "nsfw") {
+                reSendMessageAsSpoiler(sourceMessage)
+            } else {
+                bot.resend(
+                    ChatId(ConfigLoader.config!!.channel as Identifier),
+                    sourceMessage
+                )
+            }
         } else {
             val source = MessageSerializer.parseMediaGroup(
                 GzipUtils.uncompress(compressedSource)
             )
-            bot.sendMediaGroup(
-                ChatId(ConfigLoader.config!!.channel as Identifier),
-                source
-            ).content.group[0].sourceMessage
+            if (dataList[5] == "nsfw") {
+                bot.sendMediaGroup(
+                    ChatId(ConfigLoader.config!!.channel as Identifier),
+                    spoilerMediaGroup(source)
+                ).content.group[0].sourceMessage
+            } else {
+                bot.sendMediaGroup(
+                    ChatId(ConfigLoader.config!!.channel as Identifier),
+                    source
+                ).content.group[0].sourceMessage
+            }
         }
         RedisService.unset("submission:${dataList[4]}:$key")
         val groupText = StringBuilder()
@@ -105,11 +121,7 @@ class SubmissionFactory(
         RedisService.unset(key)
         val user = bot.getChat(ChatId(dataList[2].toLong())).asPrivateChat()
         if (dataList.last() == "false" || type == "command") {
-            if (sentMessage.content is PhotoContent ||
-                sentMessage.content is VideoContent ||
-                sentMessage.content is DocumentContent ||
-                sentMessage.content is AudioContent ||
-                sentMessage.content is AnimationContent
+            if (sentMessage.content is MediaContent
             ) {
                 bot.editMessageCaption(
                     chatId = sentMessage.chat.id,
@@ -143,5 +155,59 @@ class SubmissionFactory(
         }
         if (comment != null) editText.append(comment)
         return editText.toString()
+    }
+
+    private suspend fun reSendMessageAsSpoiler(sourceMessage: MessageContent): ContentMessage<MessageContent> {
+        return when (sourceMessage) {
+            is PhotoContent -> {
+                bot.sendPhoto(
+                    ChatId(ConfigLoader.config!!.channel as Identifier),
+                    sourceMessage.media,
+                    sourceMessage.text,
+                    spoilered = true
+                )
+            }
+            is VideoContent -> {
+                bot.sendVideo(
+                    ChatId(ConfigLoader.config!!.channel as Identifier),
+                    sourceMessage.media,
+                    sourceMessage.text,
+                    spoilered = true
+
+                )
+            }
+            is AnimationContent -> {
+                bot.sendAnimation(
+                    ChatId(ConfigLoader.config!!.channel as Identifier),
+                    sourceMessage.media,
+                    sourceMessage.text,
+                    spoilered = true
+                )
+            }
+            else -> {
+                bot.resend(
+                    ChatId(ConfigLoader.config!!.channel as Identifier),
+                    sourceMessage
+                )
+            }
+        }
+    }
+
+    private fun spoilerMediaGroup(mediaGroup: List<MediaGroupPartContent>): List<MediaGroupMemberTelegramMedia> {
+        val re: MutableList<MediaGroupMemberTelegramMedia> = mutableListOf()
+        mediaGroup.forEach { mediaPart ->
+            when (mediaPart.media) {
+                is PhotoSize -> {
+                    re.add(TelegramMediaPhoto(file = mediaPart.media.fileId, text = mediaPart.text, spoilered = true))
+                }
+                is VideoFile -> {
+                    re.add(TelegramMediaVideo(mediaPart.media.fileId, text = mediaPart.text, spoilered = true))
+                }
+                else -> {
+                    re.add(mediaPart as MediaGroupMemberTelegramMedia)
+                }
+            }
+        }
+        return re
     }
 }
