@@ -55,10 +55,13 @@ function check_redis {
     echo "正在安装Redis..."
     if command -v apt-get &>/dev/null; then
       sudo apt-get update
+      sudo apt-get install -y software-properties-common
+      sudo apt-get update
       sudo apt-get install -y redis
       check_redis
     elif command -v yum &>/dev/null; then
       sudo yum update
+      sudo yum --enablerepo=remi install redis
       sudo yum install -y redis
       check_redis
     elif command -v pacman &>/dev/null; then
@@ -165,19 +168,21 @@ function write_config() {
   echo "写入成功！"
 }
 
-if command -v apt-get &>/dev/null; then
-  sudo apt-get update
-  sudo apt-get install jq -y
-elif command -v yum &>/dev/null; then
-  sudo yum update
-  sudo yum install jq -y
-elif command -v pacman &>/dev/null; then
-  sudo pacman -Syu
-  sudo pacman -S jq -y
-else
-  echo "不支持的包管理器。"
-  exit 1
-fi
+function check_package_manager() {
+  if command -v apt-get &>/dev/null; then
+    sudo apt-get update
+    sudo apt-get install jq software-properties-common -y
+  elif command -v yum &>/dev/null; then
+    sudo yum update
+    sudo yum install jq -y
+  elif command -v pacman &>/dev/null; then
+    sudo pacman -Syu
+    sudo pacman -S jq -y
+  else
+    echo "不支持的包管理器。"
+    exit 1
+  fi
+}
 
 function test() {
   echo "开始试运行，如果运行没有问题，请使用Ctrl+C终止脚本，并使用：service [刚才设置的服务名] start 启动服务。"
@@ -186,6 +191,7 @@ function test() {
 
 function init() {
   check_su
+  check_package_manager
   download_jar
   check_java
   check_redis
@@ -195,6 +201,7 @@ function init() {
 }
 
 function update() {
+  check_package_manager
   download_jar
   echo "请重启服务：service [设置的服务名] restart"
 }

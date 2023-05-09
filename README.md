@@ -22,10 +22,10 @@
 1. Create a bot from @BotFather.
 2. Create a review group and invite the bot to the group.
 3. Invite the bot to the channel you want to associate with and grant it permissions.
-
+   then follow the prompts to configure (make sure the network environment is normal):
+## Dependencies (jdk>=17, Redis>=7.0)
 ## Deployment
-- If you plan to run this project on **Linux Server(arm64 or x86-64)**, **ignore the latter part of this document** and simply run the following command, then follow the prompts to configure (make sure the network environment is normal):
-
+- If you plan to run this project on **Linux Server(arm64 or x86-64)**, **ignore the latter part of this document** and simply run the following command,
 ```shell
 curl -o install.sh -fsSL https://raw.githubusercontent.com/LittleMengBot/submissionBot/main/install.sh && chmod +x install.sh && sudo ./install.sh
 ```
@@ -34,7 +34,6 @@ curl -o install.sh -fsSL https://raw.githubusercontent.com/LittleMengBot/submiss
 ```shell
 service [the service name you set in the script] start
 ```
-### Dependencies (jdk>=17, Redis>=7.0)
 ### Configuration file
 Note: The configuration file is stored in the same directory as the jar package and named config.properties:
 ```shell

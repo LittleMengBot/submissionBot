@@ -20,6 +20,7 @@
 - 1.从 @BotFather 创建一个机器人。
 - 2.建立一个审稿群并邀请机器人进群。
 - 3.邀请机器人加入你想要关联的频道，并授予权限。
+## 依赖（jdk>=17，Redis>=7.0）
 ## 部署
 - 如果您准备在：**Linux Server(arm64 or x86-64)** 上运行本项目，**请忽略本文档的后半部分**，直接运行下面的傻瓜命令，然后按照提示进行配置（确保网络环境正常）：
 ```shell
@@ -30,7 +31,6 @@ curl -o install.sh -fsSL https://raw.githubusercontent.com/LittleMengBot/submiss
 ```shell
 service [你在脚本中设置的服务名称] start
 ```
-### 依赖（jdk>=17，Redis>=7.0）
 ### 配置文件
 注意：配置文件保存在jar包同级目录。 命名为```config.properties``` 
 ```shell
