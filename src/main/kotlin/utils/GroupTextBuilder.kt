@@ -20,10 +20,12 @@ class GroupTextBuilder(
         if (submissionInfo) sb.append("${getI18nString("submission.group.info")}\n")
         if (newSubmission) sb.append("${getI18nString("submission.group.new")}\n")
         if (submissionFrom) {
-            sb.append(
-                getI18nString("submission.group.people") +
-                    "${user.firstName} ${user.lastName}".textMentionMarkdownV2(user.id) + "\n"
-            )
+            sb.append(getI18nString("submission.group.people"))
+            if (TextUtils.isTelegramBlankName(user.firstName)) {
+                sb.append("Super Blank Man (user_id: ${user.id.chatId})".textMentionMarkdownV2(user.id) + "\n")
+            } else {
+                sb.append("${user.firstName} ${user.lastName}".textMentionMarkdownV2(user.id) + "\n")
+            }
         }
         if (sourceChannel != null && forwardFrom) {
             sb.append(getI18nString("submission.group.from_channel").format(sourceChannel) + "\n")

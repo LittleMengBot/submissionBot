@@ -85,4 +85,17 @@ object RedisService {
             client!!.rename(oldKey, newKey)
         }
     }
+
+    suspend fun getInfo(): Any? {
+        val script = """
+            local total_size = 0
+            for _, key in ipairs(redis.call('keys', '*')) do
+                total_size = total_size + redis.call('memory', 'usage', key)
+            end
+            return total_size
+        """.trimIndent()
+        return kotlinx.coroutines.withContext(Dispatchers.IO) {
+            return@withContext client!!.eval(script, arrayOf("*"), emptyArray<String>(), true)
+        }
+    }
 }

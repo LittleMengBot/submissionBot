@@ -615,11 +615,17 @@ style:
       - '5'
       - '8'
       - '16'
+      - '-29'
       - '32'
+      - '49'
       - '64'
+      - '-92'
+      - '100'
+      - '-123'
       - '128'
       - '256'
       - '512'
+      - '1023'
       - '1024'
     ignoreHashCodeFunction: true
     ignorePropertyDeclaration: false

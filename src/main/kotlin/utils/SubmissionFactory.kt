@@ -11,7 +11,8 @@ import dev.inmo.tgbotapi.extensions.api.send.media.sendVideo
 import dev.inmo.tgbotapi.extensions.api.send.resend
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
-import dev.inmo.tgbotapi.extensions.utils.*
+import dev.inmo.tgbotapi.extensions.utils.asPrivateChat
+import dev.inmo.tgbotapi.extensions.utils.asTextedInput
 import dev.inmo.tgbotapi.extensions.utils.formatting.textMentionMarkdownV2
 import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.Identifier
@@ -19,7 +20,9 @@ import dev.inmo.tgbotapi.types.chat.PrivateChat
 import dev.inmo.tgbotapi.types.chat.User
 import dev.inmo.tgbotapi.types.files.PhotoSize
 import dev.inmo.tgbotapi.types.files.VideoFile
-import dev.inmo.tgbotapi.types.media.*
+import dev.inmo.tgbotapi.types.media.MediaGroupMemberTelegramMedia
+import dev.inmo.tgbotapi.types.media.TelegramMediaPhoto
+import dev.inmo.tgbotapi.types.media.TelegramMediaVideo
 import dev.inmo.tgbotapi.types.message.MarkdownV2
 import dev.inmo.tgbotapi.types.message.abstracts.ContentMessage
 import dev.inmo.tgbotapi.types.message.content.*
@@ -27,6 +30,7 @@ import dev.inmo.tgbotapi.utils.PreviewFeature
 import dev.inmo.tgbotapi.utils.RiskFeature
 import env.ConfigLoader
 import env.LocaleData.getI18nString
+import utils.TextUtils.isTelegramBlankName
 
 class SubmissionFactory(
     private val bot: BehaviourContext,
@@ -90,10 +94,17 @@ class SubmissionFactory(
         RedisService.unset("submission:${dataList[4]}:$key")
         val groupText = StringBuilder()
         groupText.append(getI18nString("submission.group.reader"))
-        groupText.append(
-            "${reader.firstName} ${reader.lastName}"
-                .textMentionMarkdownV2(reader.id)
-        )
+        if (isTelegramBlankName(reader.firstName)) {
+            groupText.append(
+                "Dear Blank Admin"
+                    .textMentionMarkdownV2(reader.id)
+            )
+        } else {
+            groupText.append(
+                "${reader.firstName} ${reader.lastName}"
+                    .textMentionMarkdownV2(reader.id)
+            )
+        }
         groupText.append("\n\n${getI18nString("submission.button.success")}")
         if (callbackReplyMessageId != null) {
             bot.edit(
@@ -151,7 +162,11 @@ class SubmissionFactory(
         }
         if (dataList.last() == "false") {
             editText.append(getI18nString("submission.group.people"))
-            editText.append("${user?.firstName} ${user?.lastName}\n")
+            if (isTelegramBlankName("${user?.firstName}${user?.lastName}")) {
+                editText.append("Super Blank Man")
+            } else {
+                editText.append("${user?.firstName} ${user?.lastName}\n")
+            }
         }
         if (comment != null) editText.append(comment)
         return editText.toString()

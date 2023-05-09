@@ -3,9 +3,7 @@ package utils
 import dev.inmo.tgbotapi.extensions.api.send.sendMessage
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.types.ChatId
-import dev.inmo.tgbotapi.types.message.MarkdownV2
 import env.ConfigLoader
-import java.lang.StringBuilder
 
 object ErrorHandler {
     fun parseStackTrace(e: Throwable): String {
@@ -22,8 +20,7 @@ object ErrorHandler {
     suspend fun sendErrorLog(bot: BehaviourContext, log: String) {
         bot.sendMessage(
             ChatId(ConfigLoader.config!!.group),
-            "*Runtime Error:*\n```$log```",
-            MarkdownV2
+            "*Runtime Error:*\n$log",
         )
     }
 }

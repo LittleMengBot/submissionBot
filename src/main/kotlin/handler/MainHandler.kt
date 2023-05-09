@@ -122,6 +122,10 @@ object MainHandler : BaseHandler() {
             BlackList(this, it).run()
         }
 
+        bc.onCommand("info|status".toRegex()) {
+            StatusCommand(this, it).run()
+        }
+
         bc.onCommandWithArgs("setlang") { msg, args ->
             SetLang(this, msg, args).run()
         }
