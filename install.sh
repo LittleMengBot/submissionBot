@@ -142,7 +142,7 @@ function write_config() {
   done
 
   read -p "频道名（例如 @durovChannel ）或频道id: " channel
-  while ! [[ $channel =~ ^[a-zA-Z0-9_-]+$ && ${#channel} -le 30 ]]; do
+  while ! [[ ${#channel} -le 30 ]]; do
     read -p "格式错误，请重新输入:" channel
   done
 
