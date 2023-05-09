@@ -1,12 +1,16 @@
-name: Gradle Build
+name: Gradle Build CI
 
 on:
   push:
-    branches:
-      - main
+    paths:
+      - '**.kt'
+      - '**.kts'
+      - '**.properties'
   pull_request:
-    branches:
-      - main
+    paths:
+      - '**.kt'
+      - '**.kts'
+      - '**.properties'
 
 jobs:
   build:
