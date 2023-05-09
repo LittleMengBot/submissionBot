@@ -80,7 +80,7 @@ object MainHandler : BaseHandler() {
     @OptIn(RiskFeature::class)
     suspend fun handleUpdate(groupPermission: Boolean, bc: BehaviourContext) {
         if (!groupPermission) {
-            logger.info(LocaleData.getI18nString("config.success"))
+            logger.warn("Please use /setgroup in a supergroup to set a group.")
             bc.onCommand("setgroup") {
                 SetGroup(this, it).run()
             }
