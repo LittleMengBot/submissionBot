@@ -33,8 +33,11 @@ function install_openjdk_17_jdk {
   elif command -v yum &>/dev/null; then
     sudo yum update
     sudo yum install -y java-17-openjdk-devel
+  elif command -v pacman &>/dev/null; then
+    sudo pacman -Syu
+    sudo pacman -S jdk-openjdk
   else
-    echo "无法在当前系统中找到适合的软件包管理器"
+    echo "无法在当前系统中找到适合的软件包管理器。请手动安装Java JDK 17或更高版本。"
     exit 1
   fi
   JAVA_VERSION=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
@@ -58,8 +61,12 @@ function check_redis {
       sudo yum update
       sudo yum install -y redis
       check_redis
+    elif command -v pacman &>/dev/null; then
+      sudo pacman -Syu
+      sudo pacman -S redis
+      check_redis
     else
-      echo "无法在当前系统中找到适合的软件包管理器"
+      echo "请手动安装Redis。"
       exit 1
     fi
     return 1
@@ -96,15 +103,11 @@ function create_service_file() {
     read -p "Service描述不符合规范，请重新输入（不能有空格，纯英文，不超过20个字符）:" SERVICE_DESCRIPTION
   done
 
-  if command -v apt-get &>/dev/null; then
-    SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
-  elif command -v yum &>/dev/null; then
+  if command -v yum &>/dev/null; then
     SERVICE_FILE="/etc/init.d/${SERVICE_NAME}.service"
   else
-    echo "Unknown OS type"
-    exit 1
+    SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
   fi
-  SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
   WORKING_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
   cat /dev/null >"$SERVICE_FILE"
@@ -168,6 +171,9 @@ if command -v apt-get &>/dev/null; then
 elif command -v yum &>/dev/null; then
   sudo yum update
   sudo yum install jq -y
+elif command -v pacman &>/dev/null; then
+  sudo pacman -Syu
+  sudo pacman -S jq -y
 else
   echo "不支持的包管理器。"
   exit 1
@@ -190,6 +196,7 @@ function init() {
 
 function update() {
   download_jar
+  echo "请重启服务：service [设置的服务名] restart"
 }
 
 function config() {
@@ -213,7 +220,7 @@ case "$option" in
   update
   ;;
 3 | config)
-  update
+  config
   ;;
 *)
   echo "输入不合法"

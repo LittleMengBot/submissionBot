@@ -24,7 +24,7 @@
 3. Invite the bot to the channel you want to associate with and grant it permissions.
 
 ## Deployment
-- If you plan to run this project on Ubuntu or CentOS, **ignore the latter part of this document** and simply run the following command, then follow the prompts to configure (make sure the network environment is normal):
+- If you plan to run this project on **Linux Server(arm64 or x86-64)**, **ignore the latter part of this document** and simply run the following command, then follow the prompts to configure (make sure the network environment is normal):
 
 ```shell
 curl -o install.sh -fsSL https://raw.githubusercontent.com/LittleMengBot/submissionBot/main/install.sh && chmod +x install.sh && sudo ./install.sh
