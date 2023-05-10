@@ -13,10 +13,10 @@ import kotlinx.coroutines.launch
 import mu.KotlinLogging
 import utils.ErrorHandler
 
-private val logger = KotlinLogging.logger {}
-
 object RedisService {
     var client: KredsClient? = null
+
+    private val logger = KotlinLogging.logger {}
 
     class RedisKeyException : Throwable()
 
