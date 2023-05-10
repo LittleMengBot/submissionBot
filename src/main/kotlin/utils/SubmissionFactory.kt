@@ -161,7 +161,8 @@ class SubmissionFactory(
             editText.append("${sentMessage.content.asTextedInput()?.text}\n\n")
         }
         if (dataList.last() == "false") {
-            editText.append(getI18nString("submission.group.people"))
+            editText.append(getI18nString("submission.channel.from"))
+            editText.append(" ")
             if (isTelegramBlankName("${user?.firstName}${user?.lastName}")) {
                 editText.append("Super Blank Man")
             } else {
