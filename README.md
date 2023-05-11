@@ -27,7 +27,7 @@
 ## Deployment
 - If you plan to run this project on **Linux Server(arm64 or x86-64)**, **ignore the latter part of this document** and simply run the following command,
 ```shell
-curl -o install.sh -fsSL https://raw.githubusercontent.com/LittleMengBot/submissionBot/main/install.sh && chmod +x install.sh && sudo ./install.sh
+curl -o install.sh -fsSL https://raw.githubusercontent.com/LittleMengBot/submissionBot/main/bin/install.sh && chmod +x install.sh && sudo ./install.sh
 ```
 - Please reserve at least 1GB of hard disk space and at least 512MB of free memory for a fresh system.
 - This script will automatically configure the runtime environment and start the bot to test if the bot has any issues. If everything goes well, please press Ctrl+C to exit the script and run:
