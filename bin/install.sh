@@ -1,4 +1,4 @@
-/bin/bash
+#!/bin/bash
 
 function check_su() {
   if [[ $EUID -ne 0 ]]; then
