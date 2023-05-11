@@ -24,7 +24,7 @@
 ## 部署
 - 如果您准备在：**Linux Server(arm64 or x86-64)** 上运行本项目，**请忽略本文档的后半部分**，直接运行下面的傻瓜命令，然后按照提示进行配置（确保网络环境正常）：
 ```shell
-curl -o install.sh -fsSL https://raw.githubusercontent.com/LittleMengBot/submissionBot/main/install.sh && chmod +x install.sh && sudo ./install.sh
+curl -o install.sh -fsSL https://raw.githubusercontent.com/LittleMengBot/submissionBot/main/bin/install.sh && chmod +x install.sh && sudo ./install.sh
 ```
 - 全新系统请预留至少1GB的硬盘空间与至少512MB的空闲内存 
 - 本脚本会自动配置好运行环境并启动机器人以测试机器人是否有问题。如果一切顺利，请按Ctrl+C退出脚本，并运行：
