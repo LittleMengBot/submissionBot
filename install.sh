@@ -128,6 +128,8 @@ function create_service_file() {
   echo "[Install]" >>"$SERVICE_FILE"
   echo "WantedBy=multi-user.target" >>"$SERVICE_FILE"
 
+  systemctl enable "$SERVICE_NAME.service"
+
   echo "Service文件创建成功: $SERVICE_FILE"
 }
 
