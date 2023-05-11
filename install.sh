@@ -62,7 +62,6 @@ function check_redis {
     elif command -v yum &>/dev/null; then
       sudo yum update
       sudo yum --enablerepo=remi install redis
-      sudo yum install -y redis
       check_redis
     elif command -v pacman &>/dev/null; then
       sudo pacman -Syu

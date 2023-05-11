@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "org.meng"
-version = "1.0.1-beta-patch-1"
+version = "1.0.1-beta-patch-2"
 
 repositories {
     mavenCentral()

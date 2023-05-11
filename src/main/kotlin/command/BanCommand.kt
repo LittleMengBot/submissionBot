@@ -1,11 +1,14 @@
 package command
 
+import base.ReplyCommandHandler
 import db.RedisService
 import dev.inmo.tgbotapi.extensions.api.send.reply
 import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
+import dev.inmo.tgbotapi.extensions.utils.extensions.raw.from
 import dev.inmo.tgbotapi.extensions.utils.ifGroupChat
 import dev.inmo.tgbotapi.types.message.abstracts.CommonMessage
 import dev.inmo.tgbotapi.types.message.content.TextContent
+import dev.inmo.tgbotapi.utils.RiskFeature
 import env.ConfigLoader
 import env.LocaleData
 import mu.KotlinLogging
@@ -16,17 +19,15 @@ open class BanCommand(
     private val bot: BehaviourContext,
     private val update: CommonMessage<TextContent>,
     private val args: Array<String>
-) : ReplyCommand(bot, update, args) {
+) : ReplyCommandHandler(bot, update) {
 
     private val logger = KotlinLogging.logger {}
 
-    init {
-        chatId = update.chat.id.chatId
-    }
     override suspend fun handle() {
         blockPart(true)
     }
 
+    @OptIn(RiskFeature::class)
     suspend fun blockPart(isBan: Boolean) {
         update.chat.ifGroupChat {
             if (!super.isInConfigGroup()) return
@@ -36,7 +37,7 @@ open class BanCommand(
                     if (BlockedUser.checkBlockStatus(dbUserId)) {
                         bot.reply(update, LocaleData.getI18nString("blacklist.already_in")); return
                     }
-                    if (dbUserId == ConfigLoader.config!!.admin) {
+                    if (dbUserId == ConfigLoader.config!!.admin || dbUserId == update.from?.id?.chatId) {
                         bot.reply(update, LocaleData.getI18nString("permission_denied")); return
                     }
                     if (args.isEmpty()) {

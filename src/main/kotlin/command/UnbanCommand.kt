@@ -4,7 +4,7 @@ import dev.inmo.tgbotapi.extensions.behaviour_builder.BehaviourContext
 import dev.inmo.tgbotapi.types.message.abstracts.CommonMessage
 import dev.inmo.tgbotapi.types.message.content.TextContent
 
-open class UnbanCommand(
+class UnbanCommand(
     bot: BehaviourContext,
     update: CommonMessage<TextContent>,
     args: Array<String>
