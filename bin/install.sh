@@ -18,7 +18,7 @@ function check_java() {
   JAVA_VERSION=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
 
   if [[ "$(echo "$JAVA_VERSION" | cut -d'.' -f1)" -ge "17" ]]; then
-    echo "Java JDK "$JAVA_VERSION"已安装"
+    echo "Java JDK ""$JAVA_VERSION""已安装"
   else
     echo "未安装Java JDK 17或更高版本。"
     echo "正在尝试安装..."
@@ -42,7 +42,7 @@ function install_openjdk_17_jdk {
   fi
   JAVA_VERSION=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
   if [[ "$(echo "$JAVA_VERSION" | cut -d'.' -f1)" -ge "17" ]]; then
-    echo "Java JDK "$JAVA_VERSION"已安装"
+    echo "Java JDK ""$JAVA_VERSION""已安装"
   else
     echo "请手动安装Java JDK 17或更高版本。"
     exit 1
@@ -77,7 +77,7 @@ function check_redis {
   if ! redis-cli ping &>/dev/null; then
     echo "Redis已安装但未启动"
     echo "正在启动Redis..."
-    for i in {1..3}; do
+    for _ in {1..3}; do
       sudo systemctl start redis
       if redis-cli ping &>/dev/null; then
         echo "Redis已成功启动"
@@ -95,14 +95,14 @@ function check_redis {
 }
 
 function create_service_file() {
-  read -p "请输入Service名称（不能有空格，纯英文，不超过20个字符，记住输入的内容）:" SERVICE_NAME
+  read -r -p "请输入Service名称（不能有空格，纯英文，不超过20个字符，记住输入的内容）:" SERVICE_NAME
   while [[ ! $SERVICE_NAME =~ ^[a-zA-Z0-9_-]{1,20}$ ]]; do
-    read -p "Service名称不符合规范，请重新输入（不能有空格，纯英文，不超过20个字符）:" SERVICE_NAME
+    read -r -p "Service名称不符合规范，请重新输入（不能有空格，纯英文，不超过20个字符）:" SERVICE_NAME
   done
 
-  read -p "请输入Service描述（不能有空格，纯英文，不超过20个字符）:" SERVICE_DESCRIPTION
+  read -r -p "请输入Service描述（不能有空格，纯英文，不超过20个字符）:" SERVICE_DESCRIPTION
   while [[ ! $SERVICE_DESCRIPTION =~ ^[a-zA-Z0-9_-]{1,20}$ ]]; do
-    read -p "Service描述不符合规范，请重新输入（不能有空格，纯英文，不超过20个字符）:" SERVICE_DESCRIPTION
+    read -r -p "Service描述不符合规范，请重新输入（不能有空格，纯英文，不超过20个字符）:" SERVICE_DESCRIPTION
   done
 
   if command -v yum &>/dev/null; then
@@ -112,21 +112,22 @@ function create_service_file() {
   fi
   WORKING_DIRECTORY="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-  cat /dev/null >"$SERVICE_FILE"
-  echo "[Unit]" >"$SERVICE_FILE"
-  echo "Description=$SERVICE_DESCRIPTION" >>"$SERVICE_FILE"
-  echo "After=multi-user.target" >>"$SERVICE_FILE"
-  echo "" >>"$SERVICE_FILE"
-  echo "[Service]" >>"$SERVICE_FILE"
-  echo "Type=idle" >>"$SERVICE_FILE"
-  echo "WorkingDirectory=$WORKING_DIRECTORY" >>"$SERVICE_FILE"
-  echo "ExecStart=/usr/bin/java -jar $WORKING_DIRECTORY/release.jar" >>"$SERVICE_FILE"
-  echo "Restart=always" >>"$SERVICE_FILE"
-  echo "RestartSec=1" >>"$SERVICE_FILE"
-  echo "StartLimitInterval=0" >>"$SERVICE_FILE"
-  echo "" >>"$SERVICE_FILE"
-  echo "[Install]" >>"$SERVICE_FILE"
-  echo "WantedBy=multi-user.target" >>"$SERVICE_FILE"
+  {
+    echo "[Unit]" >"$SERVICE_FILE";
+    echo "Description=$SERVICE_DESCRIPTION";
+    echo "After=multi-user.target";
+    echo "";
+    echo "[Service]";
+    echo "Type=idle";
+    echo "WorkingDirectory=$WORKING_DIRECTORY";
+    echo "ExecStart=/usr/bin/java -jar $WORKING_DIRECTORY/release.jar";
+    echo "Restart=always";
+    echo "RestartSec=1";
+    echo "StartLimitInterval=0";
+    echo "";
+    echo "[Install]";
+    echo "WantedBy=multi-user.target";
+  } >>"$SERVICE_FILE"
 
   systemctl enable "$SERVICE_NAME.service"
 
@@ -135,37 +136,37 @@ function create_service_file() {
 
 function write_config() {
   echo "请按要求输入下面的配置字段:"
-  read -p "Bot token（从 @BotFather 获取）:" token
+  read -r -p "Bot token（从 @BotFather 获取）:" token
   while [[ -z $token ]]; do
-    read -p "不能为空，请重新输入:" token
+    read -r -p "不能为空，请重新输入:" token
   done
 
-  read -p "管理员id（从 @userinfobot 获取）: " admin
+  read -r -p "管理员id（从 @userinfobot 获取）: " admin
   while [[ -z $admin ]]; do
-    read -p "不能为空，请重新输入:" admin
+    read -r -p "不能为空，请重新输入:" admin
   done
 
-  read -p "频道名（例如 @durovChannel ）或频道id: " channel
+  read -r -p "频道名（例如 @durovChannel ）或频道id: " channel
   while ! [[ ${#channel} -le 30 ]]; do
-    read -p "格式错误，请重新输入:" channel
+    read -r -p "格式错误，请重新输入:" channel
   done
 
-  read -p "审稿群id（可选，按回车跳过）: " group
+  read -r -p "审稿群id（可选，按回车跳过）: " group
   group=${group:--1}
-  read -p "语言 （可选，按回车跳过，默认为中文）: " lang
+  read -r -p "语言 （可选，按回车跳过，默认为中文）: " lang
   lang=${lang:-zh-CN}
 
-  read -p "Redis地址 (可选，按回车跳过，默认为 127.0.0.1:6379): " redisHost
+  read -r -p "Redis地址 (可选，按回车跳过，默认为 127.0.0.1:6379): " redisHost
   redisHost=${redisHost:-127.0.0.1:6379}
 
   echo "正在写入到config.properties..."
-  cat /dev/null >"$(dirname $0)/config.properties"
-  echo "token=$token" >"$(dirname $0)/config.properties"
-  echo "admin=$admin" >>"$(dirname $0)/config.properties"
-  echo "channel=$channel" >>"$(dirname $0)/config.properties"
-  [[ -n $group ]] && echo "group=$group" >>"$(dirname $0)/config.properties"
-  echo "lang=$lang" >>"$(dirname $0)/config.properties"
-  [[ -n $redisHost ]] && echo "redisHost=$redisHost" >>"$(dirname $0)/config.properties"
+  cat /dev/null >"$(dirname "$0")/config.properties"
+  echo "token=$token" >"$(dirname "$0")/config.properties"
+  echo "admin=$admin" >>"$(dirname "$0")/config.properties"
+  echo "channel=$channel" >>"$(dirname "$0")/config.properties"
+  [[ -n $group ]] && echo "group=$group" >>"$(dirname "$0")/config.properties"
+  echo "lang=$lang" >>"$(dirname "$0")/config.properties"
+  [[ -n $redisHost ]] && echo "redisHost=$redisHost" >>"$(dirname "$0")/config.properties"
   echo "写入成功！"
 }
 
@@ -187,7 +188,7 @@ function check_package_manager() {
 
 function test() {
   echo "开始试运行，如果运行没有问题，请使用Ctrl+C终止脚本，并使用：service [刚才设置的服务名] start 启动服务。"
-  /usr/bin/java -jar $(dirname $0)/release.jar
+  /usr/bin/java -jar "$(dirname "$0")/release.jar"
 }
 
 function init() {
@@ -215,7 +216,7 @@ function config() {
 }
 
 if [ $# -eq 0 ]; then
-  read -p "请输入功能数字（1.安装；2.更新；3.配置）：" option
+  read -r -p "请输入功能数字（1.安装；2.更新；3.配置）：" option
 else
   option="$1"
 fi
