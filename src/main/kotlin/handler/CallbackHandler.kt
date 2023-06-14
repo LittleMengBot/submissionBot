@@ -2,6 +2,7 @@ package handler
 
 import base.BaseMessageHandler
 import db.RedisService
+import dev.inmo.micro_utils.coroutines.runCatchingSafely
 import dev.inmo.tgbotapi.bot.exceptions.RequestException
 import dev.inmo.tgbotapi.extensions.api.answers.answer
 import dev.inmo.tgbotapi.extensions.api.edit.edit
@@ -82,14 +83,19 @@ class CallbackHandler(
             }
 
             data.startsWith("group") -> {
-                SubmissionFactory(
-                    bot,
-                    groupChatId = callback.message!!.chat.id.chatId,
-                    callbackMessageId = callback.message!!.messageId,
-                    callbackReplyMessageId = callback.message!!.reply_to_message!!.messageId,
-                    reader = callback.from,
-                    type = "callback"
-                ).groupCallback(data.split(":"))
+                runCatching {
+                    SubmissionFactory(
+                        bot,
+                        groupChatId = callback.message!!.chat.id.chatId,
+                        callbackMessageId = callback.message!!.messageId,
+                        callbackReplyMessageId = callback.message!!.reply_to_message!!.messageId,
+                        reader = callback.from,
+                        type = "callback"
+                    ).groupCallback(data.split(":"))
+                }.onFailure {
+                    logger.error(ErrorHandler.parseStackTrace(it))
+                    ErrorHandler.sendErrorLog(bot, "SubmissionFactory Error.\nData:$data\nError:${it.message}")
+                }
             }
         }
     }
