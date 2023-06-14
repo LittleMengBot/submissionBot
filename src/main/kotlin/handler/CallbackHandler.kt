@@ -82,14 +82,19 @@ class CallbackHandler(
             }
 
             data.startsWith("group") -> {
-                SubmissionFactory(
-                    bot,
-                    groupChatId = callback.message!!.chat.id.chatId,
-                    callbackMessageId = callback.message!!.messageId,
-                    callbackReplyMessageId = callback.message!!.reply_to_message!!.messageId,
-                    reader = callback.from,
-                    type = "callback"
-                ).groupCallback(data.split(":"))
+                runCatching {
+                    SubmissionFactory(
+                        bot,
+                        groupChatId = callback.message!!.chat.id.chatId,
+                        callbackMessageId = callback.message!!.messageId,
+                        callbackReplyMessageId = callback.message!!.reply_to_message!!.messageId,
+                        reader = callback.from,
+                        type = "callback"
+                    ).groupCallback(data.split(":"))
+                }.onFailure {
+                    logger.error(ErrorHandler.parseStackTrace(it))
+                    ErrorHandler.sendErrorLog(bot, "SubmissionFactory Error.\nData:$data\nError:${it.message}")
+                }
             }
         }
     }
