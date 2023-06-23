@@ -6,7 +6,6 @@ import io.github.crackthecodeabhi.kreds.connection.Endpoint
 import io.github.crackthecodeabhi.kreds.connection.KredsClient
 import io.github.crackthecodeabhi.kreds.connection.KredsConnectionException
 import io.github.crackthecodeabhi.kreds.connection.newClient
-import io.netty.handler.codec.CodecException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -25,9 +24,6 @@ object RedisService {
         try {
             client?.ping()
         } catch (e: KredsConnectionException) {
-            client = null
-            logger.error(ErrorHandler.parseStackTrace(e))
-        } catch (e: CodecException) {
             client = null
             logger.error(ErrorHandler.parseStackTrace(e))
         }

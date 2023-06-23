@@ -56,6 +56,7 @@ function check_redis {
     if command -v apt-get &>/dev/null; then
       sudo apt-get update
       sudo apt-get install -y software-properties-common
+      sudo add-apt-repository ppa:redislabs/redis
       sudo apt-get update
       sudo apt-get install -y redis
       check_redis

@@ -11,6 +11,7 @@ import dev.inmo.tgbotapi.types.ChatId
 import dev.inmo.tgbotapi.types.Username
 import dev.inmo.tgbotapi.types.chat.ExtendedSupergroupChatImpl
 import dev.inmo.tgbotapi.types.chat.member.AdministratorChatMemberImpl
+import dev.inmo.tgbotapi.utils.RiskFeature
 import env.LocaleData.getI18nString
 import io.ktor.client.plugins.*
 import mu.KotlinLogging
@@ -85,6 +86,8 @@ class Environment {
             return false
         }
     }
+
+    @OptIn(RiskFeature::class)
     suspend fun checkGroupPermission(bot: TelegramBot): Boolean {
         logger.info("Checking permission...")
         try {
